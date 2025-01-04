@@ -94,10 +94,12 @@ public struct Font {
     }
 
     /// <inheritdoc cref="RaylibApi.GenImageFontAtlas" />
-    public static unsafe Image GenImageAtlas(ReadOnlySpan<GlyphInfo> glyphs, ReadOnlySpan<Rectangle> glyphRecs, int fontSize, int padding, int packMethod) {
+    public static unsafe Image GenImageAtlas(ReadOnlySpan<GlyphInfo> glyphs, out ReadOnlySpan<Rectangle> glyphRecs, int fontSize, int padding, int packMethod) {
         fixed (GlyphInfo* glyphsPtr = glyphs) {
             fixed (Rectangle* glyphRecsPtr = glyphRecs) {
-                return RaylibApi.GenImageFontAtlas(glyphsPtr, &glyphRecsPtr, glyphs.Length, fontSize, padding, packMethod);
+                Image image = RaylibApi.GenImageFontAtlas(glyphsPtr, &glyphRecsPtr, glyphs.Length, fontSize, padding, packMethod);
+                glyphRecs = new Span<Rectangle>(glyphRecsPtr, glyphs.Length);
+                return image;
             }
         }
     }
